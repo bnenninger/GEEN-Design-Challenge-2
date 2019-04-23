@@ -1,5 +1,4 @@
 
-#include <LiquidCrystal.h> //includes the liquid crystal library for display
 
 
 /*
@@ -20,6 +19,9 @@
  * Flow Sensor:
  *    Data pin to digital pin 2
  */
+
+#include <LiquidCrystal.h> //includes the liquid crystal library for display
+
 //pins for LCD
 const int rs = 12, en = 11, d4 = 6, d5 = 5, d6 = 4, d7 = 3;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
@@ -48,8 +50,7 @@ void setup() {
   Serial.begin(9600);
   //starts the LCD for 16 columns and 2 rows
   lcd.begin(16, 2);
-  lcd.print("H20Saver");
-  lcd.print("initalizing...");
+  printTwoLines("H20Saver", "initializing...");
 }
 
 unsigned long previousTicks = ticks;
@@ -69,6 +70,7 @@ void loop() {
   previousTime = newTime;
   //displays and outputs the results
   LCDdisplay(getVolume(ticks), flowRate);
+//  LCDdisplay(587.602775, 4.9867);
   //outputs data to serial
   serialOutput(ticks, getVolume(ticks), flowRate);
 }
@@ -89,8 +91,24 @@ void serialOutput(long ticks, float volume, float flowRate){
  * Displays the current values to the LCD
  */
 void LCDdisplay(float volume, float flowRate){
-  lcd.print(formatString("volume: ", " L", volume, 1));
-  lcd.print(formatString("rate: ", " L/min", flowRate, 2));
+  clearLCD();
+  printTwoLines(formatString("volume: ", " L", volume, 1),
+      formatString("rate: ", " L/min", flowRate, 1));
+}
+
+void clearLCD(){
+  String clearString = "                ";
+  printTwoLines(clearString, clearString);
+}
+
+/*
+ * prints two lines to the screen
+ */
+void printTwoLines(String line1, String line2){
+  lcd.setCursor(0,0);//sets cursor with column, row
+  lcd.print(line1);
+  lcd.setCursor(0,1);
+  lcd.print(line2);
 }
 
 /*
@@ -98,8 +116,8 @@ void LCDdisplay(float volume, float flowRate){
  */
 String formatString(String label, String units, float value, int decimalPlaces){
   char valueString[16 - (sizeof(label) + sizeof(units))];
-  dtostrf(value, sizeof(valueString), 2, valueString);
-  lcd.print(label + valueString + units);
+  dtostrf(value, sizeof(valueString), decimalPlaces, valueString);
+  return label + valueString + units;
 }
 
 void incrementTick() {
