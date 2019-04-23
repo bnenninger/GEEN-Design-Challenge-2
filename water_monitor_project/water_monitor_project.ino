@@ -76,15 +76,10 @@ void loop() {
 }
 
 /*
- * Outputs data to a connected PC
+ * Outputs the number of ticks to a connected PC
  */
 void serialOutput(long ticks, float volume, float flowRate){
   Serial.print(ticks);
-  Serial.print(" ");
-  Serial.print(volume);
-  Serial.print(" ");
-  Serial.print(flowRate);
-  Serial.print("\n");
 }
 
 /*
