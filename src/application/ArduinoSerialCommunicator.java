@@ -11,11 +11,17 @@ import java.util.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 
-public class JSerialCommTestWorking {
+public class ArduinoSerialCommunicator {
 	public static SerialPort userPort;
 	static InputStream in;
 
-	public static void main(String args[]) {
+	private ArrayList<Long> modifiedList;
+	private DataStorage dataStorage;
+	
+	public ArduinoSerialCommunicator(DataStorage dataStorage) {
+		this.modifiedList = modifiedList;
+		this.dataStorage = dataStorage;
+		
 		Scanner input = new Scanner(System.in);
 		/*
 		 * This returns an array of commport addresses, not useful for the client but
@@ -54,14 +60,15 @@ public class JSerialCommTestWorking {
 					return;
 				byte[] newData = new byte[userPort.bytesAvailable()];
 				int numRead = userPort.readBytes(newData, newData.length);
-//				System.out.println("Read " + numRead + " bytes.");
-//				float data = ByteBuffer.wrap(newData).getFloat();
-				//this method gets 50% blank input, idk why, this prevents a blank byte array from being turned into a double
-				if (newData.length > 0) {
-					System.out.println(Double.parseDouble(new String(newData)));
-					System.out.print(new String(newData));
+				System.out.println("Read " + numRead + " bytes.");
+				//prevents from reading blank bits
+				if(newData.length > 0) {
+					long value = Long.parseLong(new String(newData));
+//					modifiedList.add(value);
+					dataStorage.put(value);
 				}
 			}
 		});
 	}
 }
+
