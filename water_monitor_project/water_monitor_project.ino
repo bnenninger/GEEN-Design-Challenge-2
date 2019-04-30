@@ -1,6 +1,4 @@
 
-
-
 /*
  * circuit setup:
  * LCD:
@@ -38,8 +36,8 @@ int flowMeterPin = 2;
 //9 times the age of the universe. I find this to be acceptable.
 unsigned long int ticks = 0;
 
-const double LITERS_PER_TICK = 0.0055;//currently the conversion given by the flow sensor, change if calibrated
-
+const double LITERS_PER_TICK = 0.003030303;
+//const double LITERS_PER_TICK = 0.0055;//currently the conversion given by the flow sensor, change if calibrated
 
 void setup() {
   //pin setup
@@ -72,13 +70,6 @@ void loop() {
   LCDdisplay(getVolume(ticks), flowRate);
 //  LCDdisplay(587.602775, 4.9867);
   //outputs data to serial
-  serialOutput(ticks, getVolume(ticks), flowRate);
-}
-
-/*
- * Outputs the number of ticks to a connected PC
- */
-void serialOutput(long ticks, float volume, float flowRate){
   Serial.print(ticks);
 }
 
