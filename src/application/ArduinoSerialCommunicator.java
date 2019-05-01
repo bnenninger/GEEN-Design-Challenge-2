@@ -6,37 +6,44 @@
  */
 package application;
 
-import com.fazecast.jSerialComm.*;
-import java.util.*;
-import java.io.*;
-import java.nio.ByteBuffer;
+import java.io.InputStream;
+import java.util.Scanner;
 
-public class ArduinoSerialCommunicator {
+import com.fazecast.jSerialComm.SerialPort;
+import com.fazecast.jSerialComm.SerialPortDataListener;
+import com.fazecast.jSerialComm.SerialPortEvent;
+
+public class ArduinoSerialCommunicator extends DataSource {
 	public static SerialPort userPort;
 	static InputStream in;
 
-	private ArrayList<Long> modifiedList;
-	private DataStorage dataStorage;
-	
-	public ArduinoSerialCommunicator(DataStorage dataStorage) {
-		this.modifiedList = modifiedList;
-		this.dataStorage = dataStorage;
-		
-		Scanner input = new Scanner(System.in);
+	public ArduinoSerialCommunicator(DataDisplay dataDisplay) {
+		super(dataDisplay);
+
+//		Scanner input = new Scanner(System.in);
 		/*
 		 * This returns an array of commport addresses, not useful for the client but
 		 * useful for iterating through to get an actual list of com parts available
 		 */
 		SerialPort ports[] = SerialPort.getCommPorts();
-		int i = 1;
-		// User port selection
-		System.out.println("COM Ports available on machine");
-		for (SerialPort port : ports) {
-			// iterator to pass through port array
-			System.out.println(i++ + ": " + port.getSystemPortName()); // print windows com ports
-		}
-		System.out.println("Please select COM PORT: 'COM#'");
-		SerialPort userPort = SerialPort.getCommPort(input.nextLine());
+		SerialPort userPort = SerialPort.getCommPort(ports[0].getSystemPortName());
+//		SerialPort userPort = null;
+//		if (ports.length > 1) {
+//			int i = 1;
+//			// User port selection
+//			System.out.println("COM Ports available on machine");
+//			for (SerialPort port : ports) {
+//				// iterator to pass through port array
+//				System.out.println(i++ + ": " + port.getSystemPortName()); // print windows com ports
+//			}
+//			System.out.println("Please select COM PORT: 'COM#'");
+//			userPort = SerialPort.getCommPort(input.nextLine());
+//		} else if (ports.length == 0) {
+//			System.out.println("no ports available");
+//		} else {
+//			userPort = SerialPort.getCommPort(ports[0].getSystemPortName());
+//		}
+//		input.close();
 
 		// Initializing port
 		userPort.openPort();
@@ -49,6 +56,8 @@ public class ArduinoSerialCommunicator {
 			return;
 		}
 
+		DataSource currentSource = this;
+
 		userPort.addDataListener(new SerialPortDataListener() {
 			@Override
 			public int getListeningEvents() {
@@ -60,15 +69,16 @@ public class ArduinoSerialCommunicator {
 					return;
 				byte[] newData = new byte[userPort.bytesAvailable()];
 				int numRead = userPort.readBytes(newData, newData.length);
-				System.out.println("Read " + numRead + " bytes.");
-				//prevents from reading blank bits
-				if(newData.length > 0) {
-					long value = Long.parseLong(new String(newData));
-//					modifiedList.add(value);
-					dataStorage.put(value);
+//				System.out.println("Read " + numRead + " bytes.");
+//				System.out.println(Arrays.toString(newData));
+				// prevents from reading blank bits
+//				System.out.println("\"" + data + "\"");
+				if (newData.length > 0) {
+//					String data = (new String(newData)).trim();
+					long ticks = Long.parseLong(new String(newData));
+					currentSource.add(DataDisplay.getCurrentTime(), ticks);
 				}
 			}
 		});
 	}
 }
-
