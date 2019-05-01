@@ -36,7 +36,7 @@ int flowMeterPin = 2;
 //9 times the age of the universe. I find this to be acceptable.
 unsigned long int ticks = 0;
 
-const double LITERS_PER_TICK = 0.003030303;
+const double LITERS_PER_TICK = 1.0 / 330.0;
 //const double LITERS_PER_TICK = 0.0055;//currently the conversion given by the flow sensor, change if calibrated
 
 void setup() {
@@ -68,9 +68,8 @@ void loop() {
   previousTime = newTime;
   //displays and outputs the results
   LCDdisplay(getVolume(ticks), flowRate);
-//  LCDdisplay(587.602775, 4.9867);
   //outputs data to serial
-  Serial.print(ticks);
+  Serial.print(ticks); 
 }
 
 /*
